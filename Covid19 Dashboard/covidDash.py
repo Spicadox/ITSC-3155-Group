@@ -43,16 +43,17 @@ def stackbarchart(selected_continent):
 
 # Line Chart
 def linechart(selected_continent):
-    line_df = df2[df2['Country'] == selected_continent]
-    line_df = line_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+    line_df = df2
+    #line_df = line_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     line_df['Date'] = pd.to_datetime(line_df['Date'])
     data_linechart = [go.Scatter(x=line_df['Date'], y=line_df['Confirmed'], mode='lines', name='Death')]
     return data_linechart
 
 # Multi Line Chart
 def multilinechart(selected_continent):
-    multiline_df = df2[df2['Country']]
-    multiline_df = multiline_df[multiline_df['Country'] == selected_continent]
+    #multiline_df = df2[df2['Country']]
+    multiline_df = df2
+    #multiline_df = multiline_df[multiline_df['Country'] == selected_continent]
     multiline_df['Date'] = pd.to_datetime(multiline_df['Date'])
     trace1_multiline = go.Scatter(x=multiline_df['Date'], y=multiline_df['Death'], mode='lines', name='Death')
     trace2_multiline = go.Scatter(x=multiline_df['Date'], y=multiline_df['Recovered'], mode='lines', name='Recovered')
@@ -63,16 +64,17 @@ def multilinechart(selected_continent):
 
 # Bubble chart
 def bubblechart(selected_continent):
-    bubble_df = df1.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+    #bubble_df = df1.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+    bubble_df = df1
     bubble_df = bubble_df[bubble_df['Country'] == selected_continent]
+    bubble_df = bubble_df.groupby(['State'])
     bubble_df['Unrecovered'] = bubble_df['Confirmed'] - bubble_df['Deaths'] - bubble_df['Recovered']
-    bubble_df = bubble_df[(bubble_df['Country'] != 'China')]
-    bubble_df = bubble_df.groupby(['Country']).agg(
+    bubble_df = bubble_df.groupby(['States']).agg(
         {'Confirmed': 'sum', 'Recovered': 'sum', 'Unrecovered': 'sum'}).reset_index()
     data_bubblechart = [
         go.Scatter(x=bubble_df['Recovered'],
                    y=bubble_df['Unrecovered'],
-                   text=bubble_df['Country'],
+                   text=bubble_df['States'],
                    mode='markers',
                    marker=dict(size=bubble_df['Confirmed'] / 200, color=bubble_df['Confirmed'] / 200, showscale=True))
     ]
@@ -82,7 +84,7 @@ def bubblechart(selected_continent):
 # Heatmap
 def heatmap(selected_continent):
     new_df = df1[df1['Country'] == selected_continent]
-    new_df = df1.groupby(['day', 'month']).max().reset_index()
+    new_df = df1.groupby(['state'])
     data_heatmap = [go.Heatmap(x=new_df['Day'],
                                y=new_df['WeekofMonth'],
                                z=new_df['Recovered'].values.tolist(),
@@ -112,10 +114,10 @@ app.layout = html.Div(children=[
         options=[
             {'label': 'China', 'value': 'China'},
             {'label': 'Italy', 'value': 'Italy'},
-            {'label': 'Europe', 'value': 'Europe'},
-            {'label': 'North America', 'value': 'US'},
-            {'label': 'Oceania', 'value': 'Oceania'},
-            {'label': 'South America', 'value': 'South America'}
+            {'label': 'Japan', 'value': 'Japan'},
+            {'label': 'US', 'value': 'US'},
+            {'label': 'Canada', 'value': 'Canada'},
+            {'label': 'South Korea', 'value': 'South Korea'}
         ],
         value='Europe'
     ),
@@ -127,8 +129,8 @@ app.layout = html.Div(children=[
             {'label': 'Stack bar chart', 'value': 'graph2'},
             {'label': 'Line chart', 'value': 'graph3'},
             {'label': 'Multi line chart', 'value': 'graph4'},
-            {'label': 'Bubble chart', 'value': 'graph5'},
-            {'label': 'Heat map', 'value': 'graph6'}
+            # {'label': 'Bubble chart', 'value': 'graph5'},
+            # {'label': 'Heat map', 'value': 'graph6'}
         ],
         value='graph6'
     ),
@@ -231,15 +233,15 @@ def update_figure(selected_continent, selected_figure):
         mainFig['data'] = multilinechart(selected_continent)
         mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases From 2020-01-22 to 2020-03-17',
                                       xaxis={'title': 'Date'}, yaxis={'title': 'Number of cases'})
-    elif selected_figure == 'graph5':
-        mainFig['data'] = bubblechart(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases',
-                                      xaxis={'title': 'Recovered Cases'}, yaxis={'title': 'under Treatment Cases'},
-                                      hovermode='closest')
-    elif selected_figure == 'graph6':
-        mainFig['data'] = heatmap(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Recovered Cases',
-                                      xaxis={'title': 'Day of Week'}, yaxis={'title': 'Week of Month'})
+    # elif selected_figure == 'graph5':
+    #     mainFig['data'] = bubblechart(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases',
+    #                                   xaxis={'title': 'Recovered Cases'}, yaxis={'title': 'under Treatment Cases'},
+    #                                   hovermode='closest')
+    # elif selected_figure == 'graph6':
+    #     mainFig['data'] = heatmap(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Recovered Cases',
+    #                                   xaxis={'title': 'Day of Week'}, yaxis={'title': 'Week of Month'})
     return mainFig
 
 
