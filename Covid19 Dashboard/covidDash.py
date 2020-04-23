@@ -6,8 +6,12 @@ import pandas as pd
 import plotly.graph_objs as go
 
 # Load CSV file from Datasets folder
-df1 = pd.read_csv('Datasets/CoronavirusTotal.csv')
-df2 = pd.read_csv('Datasets/CoronaTimeSeries.csv')
+df1 = pd.read_csv('Datasets/time_series_covid19_confirmed_global.csv')
+df2 = pd.read_csv('Datasets/time_series_covid19_deaths_global.csv')
+df3 = pd.read_csv('Datasets/time_series_covid19_recovered_global.csv')
+df4 = pd.read_csv('Datasets/time_series_covid19_confirmed_US.csv')
+df5 = pd.read_csv('Datasets/time_series_covid19_deaths_US.csv')
+df7 = pd.read_csv('data/countries-aggregated.csv')
 
 app = dash.Dash()
 
@@ -21,6 +25,12 @@ def barchart(selected_continent):
     data_barchart = [go.Bar(x=barchart_df['State'], y=barchart_df['Confirmed'])]
     return data_barchart
 
+# Bar chart data global
+def barchart(selected_continent):
+    barchart_df = df7[df7['Date'] == '4/21/2020']
+    barchart_df = barchart_df.groupby(['Country'])['Confirmed'].sum().reset_index()
+    data_barchart = [go.Bar(x=barchart_df['Country'], y=barchart_df['Confirmed'])]
+    return data_barchart
 
 # Stack bar chart data
 def stackbarchart(selected_continent):
