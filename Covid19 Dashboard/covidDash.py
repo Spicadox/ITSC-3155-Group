@@ -3,96 +3,63 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pandas as pd
+import glob
 import plotly.graph_objs as go
 
-# Load CSV file from Datasets folder
-df1 = pd.read_csv('Datasets/CoronavirusTotal.csv')
-df2 = pd.read_csv('Datasets/CoronaTimeSeries.csv')
+globalCountries = pd.read_csv('data/countries-aggregated.csv')
+usConfirmed = pd.read_csv('data/us_confirmed.csv')
+usDeaths = pd.read_csv('data/us_deaths.csv')
 
 app = dash.Dash()
 
-
-# Bar chart data
-def barchart(selected_continent):
-    barchart_df = df1[df1['Country'] == selected_continent]
-    barchart_df = barchart_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    barchart_df = barchart_df.groupby(['State'])['Confirmed'].sum().reset_index()
-    barchart_df = barchart_df.sort_values(by=['Confirmed'], ascending=[False]).head(20)
-    data_barchart = [go.Bar(x=barchart_df['State'], y=barchart_df['Confirmed'])]
-    return data_barchart
+# GRAPH FUNCTIONS ED & SAM WORKSPACE -------------------------------------------------------------
 
 
-# Stack bar chart data
-def stackbarchart(selected_continent):
-    stackbarchart_df = df1.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    stackbarchart_df['Unrecovered'] = stackbarchart_df['Confirmed'] - stackbarchart_df['Deaths'] - stackbarchart_df[
-    'Recovered']
-    stackbarchart_df = stackbarchart_df[(stackbarchart_df['Country'] == selected_continent)]
-    stackbarchart_df = stackbarchart_df.groupby(['State']).agg(
-    {'Confirmed': 'sum', 'Deaths': 'sum', 'Recovered': 'sum', 'Unrecovered': 'sum'}).reset_index()
-    stackbarchart_df = stackbarchart_df.sort_values(by=['Confirmed'], ascending=[False]).head(20).reset_index()
-    trace1_stackbarchart = go.Bar(x=stackbarchart_df['State'], y=stackbarchart_df['Unrecovered'], name='Under Treatment',
-                              marker={'color': '#CD7F32'})
-    trace2_stackbarchart = go.Bar(x=stackbarchart_df['State'], y=stackbarchart_df['Recovered'], name='Recovered',
-                              marker={'color': '#9EA0A1'})
-    trace3_stackbarchart = go.Bar(x=stackbarchart_df['State'], y=stackbarchart_df['Deaths'], name='Deaths',
-                              marker={'color': '#FFD700'})
-    data_stackbarchart = [trace1_stackbarchart, trace2_stackbarchart, trace3_stackbarchart]
-    return data_stackbarchart
+def barchart_global():
+    barchart_df = globalCountries[globalCountries['Date'] == '4/21/2020']
+    barchart_df = barchart_df.groupby(['Country'])['Confirmed'].sum().reset_index()
+    data_barchart = [go.Bar(x=barchart_df['Country'], y=barchart_df['Confirmed'])]
+
+    # Preparing layout
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases in The World to Date', xaxis_title="Countries",
+                       yaxis_title="Number of confirmed cases")
+
+    # Plot the figure and saving in a html file
+    fig = go.Figure(data=data_barchart, layout=layout)
+    data_barchart_global = [data_barchart, layout]
+    return data_barchart_global
+    # TODO: Add some sort of checkbox to select global data or just include it as default on the page
 
 
-# Line Chart
-def linechart(selected_continent):
-    line_df = df2
-    #line_df = line_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    line_df['Date'] = pd.to_datetime(line_df['Date'])
-    data_linechart = [go.Scatter(x=line_df['Date'], y=line_df['Confirmed'], mode='lines', name='Death')]
-    return data_linechart
-
-# Multi Line Chart
-def multilinechart(selected_continent):
-    #multiline_df = df2[df2['Country']]
-    multiline_df = df2
-    #multiline_df = multiline_df[multiline_df['Country'] == selected_continent]
-    multiline_df['Date'] = pd.to_datetime(multiline_df['Date'])
-    trace1_multiline = go.Scatter(x=multiline_df['Date'], y=multiline_df['Death'], mode='lines', name='Death')
-    trace2_multiline = go.Scatter(x=multiline_df['Date'], y=multiline_df['Recovered'], mode='lines', name='Recovered')
-    trace3_multiline = go.Scatter(x=multiline_df['Date'], y=multiline_df['Unrecovered'], mode='lines', name='Under Treatment')
-    data_multiline = [trace1_multiline, trace2_multiline, trace3_multiline]
-    return data_multiline
+def stackbarchart_global():
+    pass
 
 
-# Bubble chart
-def bubblechart(selected_continent):
-    #bubble_df = df1.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    bubble_df = df1
-    bubble_df = bubble_df[bubble_df['Country'] == selected_continent]
-    bubble_df = bubble_df.groupby(['State'])
-    bubble_df['Unrecovered'] = bubble_df['Confirmed'] - bubble_df['Deaths'] - bubble_df['Recovered']
-    bubble_df = bubble_df.groupby(['States']).agg(
-        {'Confirmed': 'sum', 'Recovered': 'sum', 'Unrecovered': 'sum'}).reset_index()
-    data_bubblechart = [
-        go.Scatter(x=bubble_df['Recovered'],
-                   y=bubble_df['Unrecovered'],
-                   text=bubble_df['States'],
-                   mode='markers',
-                   marker=dict(size=bubble_df['Confirmed'] / 200, color=bubble_df['Confirmed'] / 200, showscale=True))
-    ]
-    return data_bubblechart
+def multilinechart_global():
+    pass
 
 
-# Heatmap
-def heatmap(selected_continent):
-    new_df = df1[df1['Country'] == selected_continent]
-    new_df = df1.groupby(['state'])
-    data_heatmap = [go.Heatmap(x=new_df['Day'],
-                               y=new_df['WeekofMonth'],
-                               z=new_df['Recovered'].values.tolist(),
-                               colorscale='Jet')]
-    return data_heatmap
+def bubblechart_global():
+    pass
 
 
-# Layout
+def barchart_US():
+    pass
+
+
+def stackbarchart_US():
+    pass
+
+
+def multilinechart_US():
+    pass
+
+
+def bubblechart_US():
+    pass
+
+
+# WEBSITE LAYOUT JINQUAN WORKSPACE ---------------------------------------------------------------
 app.layout = html.Div(children=[
     html.H1(children='TEAM J.E.T.S Draft',
             style={
@@ -209,30 +176,33 @@ app.layout = html.Div(children=[
     #           )
 ])
 
+# UPDATE FIGURE FUNCTION ED & SAM WORKSPACE ---------------------------------------------------------
+
 
 @app.callback(Output('graph1', 'figure'),
               [Input('select-continent', 'value'),
                Input('select-figure', 'value')])
 def update_figure(selected_continent, selected_figure):
+    # TODO: THIS WILL NEED TO BE REWRITTEN
     mainFig = {}
-    if selected_figure == 'graph1':
-        mainFig['data'] = barchart(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
-                                      xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
-    elif selected_figure == 'graph2':
-        mainFig['data'] = stackbarchart(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country except China',
-                                      xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
-                                      barmode='stack')
-    elif selected_figure == 'graph3':
-        mainFig['data'] = linechart(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country expect China',
-                                      xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
-                                      barmode='stack')
-    elif selected_figure == 'graph4':
-        mainFig['data'] = multilinechart(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases From 2020-01-22 to 2020-03-17',
-                                      xaxis={'title': 'Date'}, yaxis={'title': 'Number of cases'})
+    # if selected_figure == 'graph1':
+    #     mainFig['data'] = barchart(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
+    #                                   xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
+    # elif selected_figure == 'graph2':
+    #     mainFig['data'] = stackbarchart(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country except China',
+    #                                   xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
+    #                                   barmode='stack')
+    # elif selected_figure == 'graph3':
+    #     mainFig['data'] = linechart(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country expect China',
+    #                                   xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
+    #                                   barmode='stack')
+    # elif selected_figure == 'graph4':
+    #     mainFig['data'] = multilinechart(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases From 2020-01-22 to 2020-03-17',
+    #                                   xaxis={'title': 'Date'}, yaxis={'title': 'Number of cases'})
     # elif selected_figure == 'graph5':
     #     mainFig['data'] = bubblechart(selected_continent)
     #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases',
