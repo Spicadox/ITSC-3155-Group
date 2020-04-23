@@ -6,9 +6,9 @@ import pandas as pd
 import glob
 import plotly.graph_objs as go
 
-globalCountries = pd.read_csv('Datasets/countries-aggregated.csv')
-usConfirmed = pd.read_csv('Datasets/us_confirmed.csv')
-usDeaths = pd.read_csv('Datasets/us_deaths.csv')
+globalCountries = pd.read_csv('../Datasets/countries-aggregated.csv')
+usConfirmed = pd.read_csv('../Datasets/us_confirmed.csv')
+usDeaths = pd.read_csv('../Datasets/us_deaths.csv')
 
 app = dash.Dash()
 
@@ -16,7 +16,7 @@ app = dash.Dash()
 
 
 def barchart_global():
-    barchart_df = globalCountries[globalCountries['Date'] == '4/21/2020']
+    barchart_df = globalCountries[globalCountries['Date'] == '2020/04/21']
     barchart_df = barchart_df.groupby(['Country'])['Confirmed'].sum().reset_index()
     data_barchart = [go.Bar(x=barchart_df['Country'], y=barchart_df['Confirmed'])]
 
@@ -25,8 +25,7 @@ def barchart_global():
                        yaxis_title="Number of confirmed cases")
 
     # Plot the figure and saving in a html file
-    fig = go.Figure(data=data_barchart, layout=layout)
-    data_barchart_global = [data_barchart, layout]
+    data_barchart_global = go.Figure(data=data_barchart, layout=layout)
     return data_barchart_global
     # TODO: Add some sort of checkbox to select global data or just include it as default on the page
 
@@ -185,6 +184,8 @@ app.layout = html.Div(children=[
 def update_figure(selected_continent, selected_figure):
     # TODO: THIS WILL NEED TO BE REWRITTEN
     mainFig = {}
+    if selected_continent == 'US' and selected_figure == 'graph1':
+        return barchart_global()
     # if selected_figure == 'graph1':
     #     mainFig['data'] = barchart(selected_continent)
     #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
