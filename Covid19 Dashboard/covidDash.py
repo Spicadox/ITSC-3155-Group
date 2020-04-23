@@ -6,9 +6,9 @@ import pandas as pd
 import glob
 import plotly.graph_objs as go
 
-globalCountries = pd.read_csv('data/countries-aggregated.csv')
-usConfirmed = pd.read_csv('data/us_confirmed.csv')
-usDeaths = pd.read_csv('data/us_deaths.csv')
+globalCountries = pd.read_csv('Datasets/countries-aggregated.csv')
+usConfirmed = pd.read_csv('Datasets/us_confirmed.csv')
+usDeaths = pd.read_csv('Datasets/us_deaths.csv')
 
 app = dash.Dash()
 
