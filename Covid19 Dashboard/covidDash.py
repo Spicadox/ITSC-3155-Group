@@ -17,7 +17,7 @@ app = dash.Dash()
 
 def barchart_global():
     barchart_df = globalCountries[globalCountries['Date'] == '2020-04-21']
-    barchart_df = barchart_df.groupby(['Country'])['Confirmed'].sum().reset_index()
+    barchart_df = barchart_df.sort_values('Confirmed', ascending=False).head(50)
     data_barchart = [go.Bar(x=barchart_df['Country'], y=barchart_df['Confirmed'])]
 
     # Preparing layout
