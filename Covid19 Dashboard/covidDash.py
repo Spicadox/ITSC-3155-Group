@@ -16,8 +16,10 @@ app = dash.Dash()
 
 
 def barchart_global():
-    barchart_df = globalCountries[globalCountries['Date'] == '2020-04-21']
-    barchart_df = barchart_df.sort_values('Confirmed', ascending=False).head(50)
+    recentdate = pd.to_datetime(globalCountries['Date'], format='%Y-%m-%d').max()
+    recentdate = str(recentdate).rstrip(' 00:00:00')
+    barchart_df = globalCountries[globalCountries['Date'] == recentdate]
+    barchart_df = barchart_df.sort_values(by=['Confirmed'], ascending=[False]).head(50)
     data_barchart = [go.Bar(x=barchart_df['Country'], y=barchart_df['Confirmed'])]
 
     # Preparing layout
@@ -30,8 +32,31 @@ def barchart_global():
     # TODO: Add some sort of checkbox to select global data or just include it as default on the page
 
 
-def stackbarchart_global():
-    pass
+
+def multibarchart_global():
+    recentdate = pd.to_datetime(globalCountries['Date'], format='%Y-%m-%d').max()
+    recentdate = str(recentdate).rstrip(' 00:00:00')
+    multibarchart_df = globalCountries
+    multibarchart_df = multibarchart_df[multibarchart_df["Date"] == recentdate]
+    multibarchart_df = multibarchart_df.groupby(['Country']).agg(
+        {'Confirmed': 'sum', 'Deaths': 'sum', 'Recovered': 'sum'}).reset_index()
+    multibarchart_df = multibarchart_df.sort_values(by=['Confirmed'], ascending=[False]).head(20).reset_index()
+    trace1_multibarchart = go.Bar(x=multibarchart_df['Country'], y=multibarchart_df['Confirmed'], name='Confirmed',
+                                  marker={'color': '#FFA500'})
+    trace2_multibarchart = go.Bar(x=multibarchart_df['Country'], y=multibarchart_df['Recovered'], name='Recovered',
+                                  marker={'color': '#008000'})
+    trace3_multibarchart = go.Bar(x=multibarchart_df['Country'], y=multibarchart_df['Deaths'], name='Deaths',
+                                  marker={'color': '#696969'})
+    data_multibarchart = [trace1_multibarchart, trace2_multibarchart, trace3_multibarchart]
+
+    # Preparing layout
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases, Recovered, and Deaths in The World to Date', xaxis_title="Countries",
+                       yaxis_title="Number of confirmed cases")
+
+    # Plot the figure and saving in a html file
+    data_multibarchart_global = go.Figure(data=data_multibarchart, layout=layout)
+    return data_multibarchart_global
+
 
 
 def multilinechart_global():
@@ -43,11 +68,51 @@ def bubblechart_global():
 
 
 def barchart_US():
-    pass
+    recentdate = pd.to_datetime(usConfirmed['Date'], format='%Y-%m-%d').max()
+    recentdate = str(recentdate).rstrip(' 00:00:00')
+    barchart_df = usConfirmed
+    barchart_df = barchart_df[barchart_df["Date"] == recentdate]
+    barchart_df = barchart_df.groupby(['Province/State'])['Case'].sum().reset_index()
+    barchart_df = barchart_df.sort_values(by=['Case'], ascending=[False]).head(50)
+    data_barchart = [go.Bar(x=barchart_df['Province/State'], y=barchart_df['Case'])]
+
+    # Preparing layout
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases in The United States to Date', xaxis_title="States",
+                       yaxis_title="Number of confirmed cases")
+
+    # Plot the figure and saving in a html file
+    data_barchart_US = go.Figure(data=data_barchart, layout=layout)
+    return data_barchart_US
 
 
-def stackbarchart_US():
-    pass
+def multibarchart_US():
+    recentdate = pd.to_datetime(usConfirmed['Date'], format='%Y-%m-%d').max()
+    recentdate = str(recentdate).rstrip(' 00:00:00')
+    print(recentdate)
+    multibarchartconfirmed_df = usConfirmed
+    multibarchartdeath_df = usDeaths
+    multibarchartconfirmed_df = multibarchartconfirmed_df[multibarchartconfirmed_df["Date"] == recentdate]
+    multibarchartdeath_df = multibarchartdeath_df[multibarchartdeath_df["Date"] == recentdate]
+
+    multibarchartconfirmed_df = multibarchartconfirmed_df.groupby(['Province/State']).agg(
+        {'Case': 'sum'}).reset_index()
+    multibarchartdeath_df = multibarchartdeath_df.groupby(['Province/State']).agg(
+        {'Case': 'sum'}).reset_index()
+    trace1_multibarchart = go.Bar(x=multibarchartconfirmed_df['Province/State'], y=multibarchartconfirmed_df['Case'],
+                                  name='Confirmed Cases',
+                                  marker={'color': '#CD7F32'})
+    trace2_multibarchart = go.Bar(x=multibarchartdeath_df['Province/State'], y=multibarchartdeath_df['Case'],
+                                  name='Deaths',
+                                  marker={'color': '#9EA0A1'})
+    data_multibarchart = [trace1_multibarchart, trace2_multibarchart]
+
+    # Preparing layout
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases and Deaths in The United States to Date', xaxis_title="States",
+                       yaxis_title="Number of confirmed cases")
+
+    # Plot the figure and saving in a html file
+    data_multibarchart_US = go.Figure(data=data_multibarchart, layout=layout)
+    return data_multibarchart_US
 
 
 def multilinechart_US():
