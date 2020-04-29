@@ -163,8 +163,8 @@ app.layout = html.Div(children=[
 
             {'label': 'Bar chart Global', 'value': 'graph1'},
             {'label': 'Bar chart Local', 'value': 'graph2'},
-            {'label': 'Multi bar chart', 'value': 'graph3'},
-            {'label': 'Multi bar chart', 'value': 'graph4'},
+            {'label': 'Multi bar chart Global', 'value': 'graph3'},
+            {'label': 'Multi bar chart Local', 'value': 'graph4'},
 
             # {'label': 'Bubble chart', 'value': 'graph5'},
             # {'label': 'Heat map', 'value': 'graph6'}
