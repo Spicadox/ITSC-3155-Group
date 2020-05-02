@@ -124,6 +124,13 @@ def bubblechart_US():
 
 
 # WEBSITE LAYOUT JINQUAN WORKSPACE ---------------------------------------------------------------
+figures = {'global_figures': ['Global bar chart', 'Global multi bar chart', 'Global multi line chart', 'Global bubble chart'],
+           'local_figures': ['Local bar chart', 'Local multi bar chart', 'Local multi line chart', 'Local bubble chart']
+}
+global_or_local = 'global_figures'
+disable_or_not = True
+
+
 app.layout = html.Div(children=[
     html.H1(children='TEAM J.E.T.S Draft',
             style={
@@ -139,31 +146,46 @@ app.layout = html.Div(children=[
     html.H3('Interactive Bar chart', style={'color': '#df1e56'}),
     html.Div('TODO: Put Information about Bar chart here'),
     dcc.Graph(id='graph1'),
+    html.Div('Would you like a global chart or US chart?', style={'color': '#ef3e18', 'margin':'10px'}),
+    dcc.Dropdown(
+        id='select-scope',
+        options=[
+            {'label': 'Global chart', 'value': 'global_chart'},
+            {'label': 'A specific country chart', 'value': 'country_chart'},
+            {'label': 'US chart', 'value': 'us_chart'}
+        ],
+        placeholder='Select a scope'
+    ),
+
     html.Div('Please select a country', style={'color': '#ef3e18', 'margin':'10px'}),
     dcc.Dropdown(
         id='select-continent',
         options=[
+            {'label': 'US', 'value': 'US'},
             {'label': 'China', 'value': 'China'},
             {'label': 'Italy', 'value': 'Italy'},
             {'label': 'Japan', 'value': 'Japan'},
-            {'label': 'US', 'value': 'US'},
             {'label': 'Canada', 'value': 'Canada'},
             {'label': 'South Korea', 'value': 'South Korea'}
         ],
-        value='Europe'
+        placeholder='Select a country',
+        disabled=True
     ),
     html.Div('Please select a figure', style={'color': '#ef3e18', 'margin':'10px'}),
     dcc.Dropdown(
         id='select-figure',
         options=[
-            {'label': 'Bar chart', 'value': 'graph1'},
-            {'label': 'Stack bar chart', 'value': 'graph2'},
-            {'label': 'Line chart', 'value': 'graph3'},
-            {'label': 'Multi line chart', 'value': 'graph4'},
-            # {'label': 'Bubble chart', 'value': 'graph5'},
-            # {'label': 'Heat map', 'value': 'graph6'}
+            # {'label': 'Global Bar chart', 'value': 'graph1'},
+            # {'label': 'Local Bar chart', 'value': 'graph2'},
+            # {'label': 'Global Multi bar chart', 'value': 'graph3'},
+            # {'label': 'Local Multi bar chart', 'value': 'graph4'},
+            # {'label': 'Global Multi line chart', 'value': 'graph5'},
+            # {'label': 'Local Multi line chart', 'value': 'graph6'},
+            # {'label': 'Global Bubble chart', 'value': 'graph7'},
+            # {'label': 'Local Bubble chart', 'value': 'graph8'}
+            {'label': k, 'value': k} for k in figures.get('global_figures', '')
         ],
-        value='graph6'
+        placeholder='Select a figure'
     ),
 
     # html.Br(),
@@ -241,6 +263,32 @@ app.layout = html.Div(children=[
 ])
 
 # UPDATE FIGURE FUNCTION ED & SAM WORKSPACE ---------------------------------------------------------
+# Enable or disable 1st dropdown box(i.e.Selecting country)
+@app.callback(Output('select-continent', 'disabled'),
+              [Input('select-scope', 'value')])
+def disable_local_figures(select_scope):
+    if select_scope == 'global_chart':
+        return True
+    elif select_scope == 'country_chart':
+        return False
+    elif select_scope == 'us_chart':
+        return True
+
+# Placeholder set to US if the scope is selected as us chart
+@app.callback(Output('select-continent', 'placeholder'),
+              [Input('select-scope', 'value')])
+def disable_local_figures(select_scope):
+    if select_scope == 'us_chart':
+        return 'US'
+
+# Output a list of either global or local figures in last dropdown box
+@app.callback(Output('select-figure', 'options'),
+              [Input('select-scope', 'value')])
+def disable_local_figures(select_scope):
+    if select_scope == 'global_chart':
+        return [{'label': k, 'value': k} for k in figures['global_figures']]
+    if select_scope == 'us_chart':
+        return [{'label': k, 'value': k} for k in figures['local_figures']]
 
 
 @app.callback(Output('graph1', 'figure'),
@@ -251,10 +299,22 @@ def update_figure(selected_continent, selected_figure):
     mainFig = {}
     if selected_continent == 'US' and selected_figure == 'graph1':
         return barchart_global()
-    # if selected_figure == 'graph1':
-    #     mainFig['data'] = barchart(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
-    #                                   xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
+
+    # DEMO
+    elif selected_figure == 'graph1':
+        return barchart_global()
+    elif selected_figure == 'graph2':
+        return barchart_US()
+    elif selected_figure == 'graph3':
+        return multibarchart_global()
+    elif selected_figure == 'graph4':
+        return multibarchart_US()
+
+    # END OF DEMO
+    if selected_figure == 'graph1':
+        mainFig['data'] = barchart(selected_continent)
+        mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
+                                      xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
     # elif selected_figure == 'graph2':
     #     mainFig['data'] = stackbarchart(selected_continent)
     #     mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country except China',
