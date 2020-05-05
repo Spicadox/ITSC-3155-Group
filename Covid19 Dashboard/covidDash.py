@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output
 import pandas as pd
 import glob
 import plotly.graph_objs as go
+import plotly.express as px
 
 globalCountries = pd.read_csv('../Datasets/countries-aggregated.csv')
 usConfirmed = pd.read_csv('../Datasets/us_confirmed.csv')
@@ -26,11 +27,10 @@ def barchart_global():
     layout = go.Layout(title='Total Corona Virus Confirmed Cases in The World to Date', xaxis_title="Countries",
                        yaxis_title="Number of confirmed cases")
 
-    # Plot the figure and saving in a html file
+    # Return the figure
     data_barchart_global = go.Figure(data=data_barchart, layout=layout)
     return data_barchart_global
     # TODO: Add some sort of checkbox to select global data or just include it as default on the page
-
 
 
 def multibarchart_global():
@@ -53,14 +53,26 @@ def multibarchart_global():
     layout = go.Layout(title='Total Corona Virus Confirmed Cases, Recovered, and Deaths in The World to Date', xaxis_title="Countries",
                        yaxis_title="Number of confirmed cases")
 
-    # Plot the figure and saving in a html file
+    # Return the figure
     data_multibarchart_global = go.Figure(data=data_multibarchart, layout=layout)
     return data_multibarchart_global
 
 
-
 def multilinechart_global():
-    pass
+    recentdate = pd.to_datetime(usConfirmed['Date'], format='%Y-%m-%d').max()
+    recentdate = str(recentdate).rstrip(' 00:00:00')
+    multilinechart_df = globalCountries
+    multilinechart_df = multilinechart_df.groupby(['Country', 'Date']).agg(
+        {'Confirmed': 'sum'}).reset_index()
+
+    data_multilinechart_global = px.line(multilinechart_df, x='Date', y='Confirmed', color='Country',
+                                     line_group="Country", hover_name="Country",
+                                     line_shape="spline", render_mode="svg",
+                                     title='Corona Virus Confirmed Cases Over Time')
+    data_multilinechart_global.update_xaxes(title="Date")
+    data_multilinechart_global.update_yaxes(title="Number of confirmed cases")
+
+    return data_multilinechart_global
 
 
 def bubblechart_global():
@@ -80,7 +92,7 @@ def barchart_US():
     layout = go.Layout(title='Total Corona Virus Confirmed Cases in The United States to Date', xaxis_title="States",
                        yaxis_title="Number of confirmed cases")
 
-    # Plot the figure and saving in a html file
+    # Return the figure
     data_barchart_US = go.Figure(data=data_barchart, layout=layout)
     return data_barchart_US
 
@@ -88,7 +100,6 @@ def barchart_US():
 def multibarchart_US():
     recentdate = pd.to_datetime(usConfirmed['Date'], format='%Y-%m-%d').max()
     recentdate = str(recentdate).rstrip(' 00:00:00')
-    print(recentdate)
     multibarchartconfirmed_df = usConfirmed
     multibarchartdeath_df = usDeaths
     multibarchartconfirmed_df = multibarchartconfirmed_df[multibarchartconfirmed_df["Date"] == recentdate]
@@ -110,13 +121,26 @@ def multibarchart_US():
     layout = go.Layout(title='Total Corona Virus Confirmed Cases and Deaths in The United States to Date', xaxis_title="States",
                        yaxis_title="Number of confirmed cases")
 
-    # Plot the figure and saving in a html file
+    # Return the figure
     data_multibarchart_US = go.Figure(data=data_multibarchart, layout=layout)
     return data_multibarchart_US
 
 
 def multilinechart_US():
-    pass
+    recentdate = pd.to_datetime(usConfirmed['Date'], format='%Y-%m-%d').max()
+    recentdate = str(recentdate).rstrip(' 00:00:00')
+    multilinechartconfirmed_df = usConfirmed
+    multilinechartdeaths_df = usDeaths
+    multilinechartconfirmed_df = multilinechartconfirmed_df.groupby(['Province/State', 'Date']).agg(
+        {'Case': 'sum'}).reset_index()
+
+    data_multilinechart_US = px.line(multilinechartconfirmed_df, x='Date', y='Case', color='Province/State', line_group="Province/State",
+                                  hover_name="Province/State", line_shape="spline", render_mode="svg",
+                                  title='Corona Virus Confirmed Cases Over Time')
+    data_multilinechart_US.update_xaxes(title="Date")
+    data_multilinechart_US.update_yaxes(title="Number of confirmed cases")
+
+    return data_multilinechart_US
 
 
 def bubblechart_US():
@@ -268,6 +292,7 @@ app.layout = html.Div(children=[
 
 # UPDATE FIGURE FUNCTION ED & SAM WORKSPACE ---------------------------------------------------------
 
+
 # Enable or disable dropdown boxes
 # Placeholder set to US if the scope is selected as us chart
 # Return a list of figure options based on scope
@@ -301,12 +326,20 @@ def update_figure(selected_continent, selected_figure):
         return multibarchart_global()
     elif selected_figure == 'Local multi bar chart':
         return multibarchart_US()
+    elif selected_figure == 'Global multi line chart':
+        return multilinechart_global()
+    elif selected_figure == 'Local multi line chart':
+        return multilinechart_US()
+    elif selected_figure == 'Global bubble chart':
+        return bubblechart_global()
+    elif selected_figure == 'Local bubble chart':
+        return bubblechart_US()
 
     # END OF DEMO
-    if selected_figure == 'graph1':
-        mainFig['data'] = barchart(selected_continent)
-        mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
-                                      xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
+    # if selected_figure == 'graph1':
+    #     mainFig['data'] = barchart(selected_continent)
+    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
+    #                                   xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
     # elif selected_figure == 'graph2':
     #     mainFig['data'] = stackbarchart(selected_continent)
     #     mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country except China',
