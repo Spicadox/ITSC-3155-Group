@@ -3,7 +3,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pandas as pd
-import glob
 import plotly.graph_objs as go
 import plotly.express as px
 
@@ -34,7 +33,6 @@ def barchart_global():
     # Return the figure
     data_barchart_global = go.Figure(data=data_barchart, layout=layout)
     return data_barchart_global
-    # TODO: Add some sort of checkbox to select global data or just include it as default on the page
 
 
 def multibarchart_global():
@@ -54,8 +52,7 @@ def multibarchart_global():
     data_multibarchart = [trace1_multibarchart, trace2_multibarchart, trace3_multibarchart]
 
     # Preparing layout
-    layout = go.Layout(title='Total Corona Virus Confirmed Cases, Recovered, and Deaths in The World to Date',
-                       xaxis_title="Countries",
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases, Recovered, and Deaths in The World to Date', xaxis_title="Countries",
                        yaxis_title="Number of confirmed cases")
 
     # Return the figure
@@ -71,17 +68,13 @@ def multilinechart_global():
         {'Confirmed': 'sum'}).reset_index()
 
     data_multilinechart_global = px.line(multilinechart_df, x='Date', y='Confirmed', color='Country',
-                                         line_group="Country", hover_name="Country",
-                                         line_shape="spline", render_mode="svg",
-                                         title='Corona Virus Confirmed Cases Over Time')
+                                     line_group="Country", hover_name="Country",
+                                     line_shape="spline", render_mode="svg",
+                                     title='Corona Virus Confirmed Cases Over Time')
     data_multilinechart_global.update_xaxes(title="Date")
     data_multilinechart_global.update_yaxes(title="Number of confirmed cases")
 
     return data_multilinechart_global
-
-
-def bubblechart_global():
-    pass
 
 
 def barchart_US():
@@ -123,8 +116,7 @@ def multibarchart_US():
     data_multibarchart = [trace1_multibarchart, trace2_multibarchart]
 
     # Preparing layout
-    layout = go.Layout(title='Total Corona Virus Confirmed Cases and Deaths in The United States to Date',
-                       xaxis_title="States",
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases and Deaths in The United States to Date', xaxis_title="States",
                        yaxis_title="Number of confirmed cases")
 
     # Return the figure
@@ -140,18 +132,12 @@ def multilinechart_US():
     multilinechartconfirmed_df = multilinechartconfirmed_df.groupby(['Province/State', 'Date']).agg(
         {'Case': 'sum'}).reset_index()
 
-    data_multilinechart_US = px.line(multilinechartconfirmed_df, x='Date', y='Case', color='Province/State',
-                                     line_group="Province/State",
-                                     hover_name="Province/State", line_shape="spline", render_mode="svg",
-                                     title='Corona Virus Confirmed Cases Over Time')
+    data_multilinechart_US = px.line(multilinechartconfirmed_df, x='Date', y='Case', color='Province/State', line_group="Province/State",
+                                  hover_name="Province/State", line_shape="spline", render_mode="svg",
+                                  title='Corona Virus Confirmed Cases Over Time')
     data_multilinechart_US.update_xaxes(title="Date")
     data_multilinechart_US.update_yaxes(title="Number of confirmed cases")
-
     return data_multilinechart_US
-
-
-def bubblechart_US():
-    pass
 
 
 # WEBSITE LAYOUT JINQUAN WORKSPACE ---------------------------------------------------------------
@@ -235,96 +221,12 @@ app.layout = html.Div(
         dcc.Dropdown(
             id='select-figure',
             options=[
-                ## NO LONGER NEEDED ##
-                # {'label': 'Global Bar chart', 'value': 'graph1'},
-                # {'label': 'Local Bar chart', 'value': 'graph2'},
-                # {'label': 'Global Multi bar chart', 'value': 'graph3'},
-                # {'label': 'Local Multi bar chart', 'value': 'graph4'},
-                # {'label': 'Global Multi line chart', 'value': 'graph5'},
-                # {'label': 'Local Multi line chart', 'value': 'graph6'},
-                # {'label': 'Global Bubble chart', 'value': 'graph7'},
-                # {'label': 'Local Bubble chart', 'value': 'graph8'}
-                ## NO LONGER NEEDED ##
-                # {'label': j, 'value': j} for j in figures.values()
                 {'label': k, 'value': k} for k in all_figures
             ],
             placeholder='Select a figure',
             disabled=True,
             className="six columns"
         ),
-
-        # html.Br(),
-        # html.Hr(style={'color': '#7FDBFF'}),
-        # html.H3('Bar chart', style={'color': '#df1e56'}),
-        # html.Div('This bar chart represent the number of confirmed cases in the first 20 states of the US.'),
-        # dcc.Graph(id='graph2',
-        #           figure={
-        #               'data': data_barchart,
-        #               'layout': go.Layout(title='Corona Virus Confirmed Cases in The US',
-        #                                   xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
-        #           }
-        #           ),
-        # html.Hr(style={'color': '#7FDBFF'}),
-        # html.H3('Stack bar chart', style={'color': '#df1e56'}),
-        # html.Div(
-        #     'This stack bar chart represent the CoronaVirus deaths,
-        #     recovered and under treatment of all reported first 20 countries except China.'),
-        # dcc.Graph(id='graph3',
-        #           figure={
-        #               'data': data_stackbarchart,
-        #               'layout': go.Layout(title='Corona Virus Cases in the first 20 country expect China',
-        #                                   xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
-        #                                   barmode='stack')
-        #           }
-        #           ),
-        # html.Hr(style={'color': '#7FDBFF'}),
-        # html.H3('Line chart', style={'color': '#df1e56'}),
-        # html.Div('This line chart represent the Corona Virus confirmed cases of all reported cases in the given period.'),
-        # dcc.Graph(id='graph4',
-        #           figure={
-        #               'data': data_linechart,
-        #               'layout': go.Layout(title='Corona Virus Confirmed Cases From 2020-01-22 to 2020-03-17',
-        #                                   xaxis={'title': 'Date'}, yaxis={'title': 'Number of cases'})
-        #           }
-        #           ),
-        # html.Hr(style={'color': '#7FDBFF'}),
-        # html.H3('Multi Line chart', style={'color': '#df1e56'}),
-        # html.Div(
-        #     'This line chart represent the CoronaVirus death,
-        #     recovered and under treatment cases of all reported cases in the given period.'),
-        # dcc.Graph(id='graph5',
-        #           figure={
-        #               'data': data_multiline,
-        #               'layout': go.Layout(
-        #                   title='Corona Virus Death, Recovered and under treatment Cases From 2020-01-22 to 2020-03-17',
-        #                   xaxis={'title': 'Date'}, yaxis={'title': 'Number of cases'})
-        #           }
-        #           ),
-        # html.Hr(style={'color': '#7FDBFF'}),
-        # html.H3('Bubble chart', style={'color': '#df1e56'}),
-        # html.Div(
-        #     'This bubble chart represent the Corona Virus recovered and under treatment
-        #     of all reported countries except China.'),
-        # dcc.Graph(id='graph6',
-        #           figure={
-        #               'data': data_bubblechart,
-        #               'layout': go.Layout(title='Corona Virus Confirmed Cases',
-        #                                   xaxis={'title': 'Recovered Cases'}, yaxis={'title': 'under Treatment Cases'},
-        #                                   hovermode='closest')
-        #           }
-        #           ),
-        # html.Hr(style={'color': '#7FDBFF'}),
-        # html.H3('Heat map', style={'color': '#df1e56'}),
-        # html.Div(
-        #     'This heat map represent the Corona Virus recovered cases of all reported cases
-        #     per day of week and week of month.'),
-        # dcc.Graph(id='graph7',
-        #           figure={
-        #               'data': data_heatmap,
-        #               'layout': go.Layout(title='Corona Virus Recovered Cases',
-        #                                   xaxis={'title': 'Day of Week'}, yaxis={'title': 'Week of Month'})
-        #           }
-        #           )
     ])
 
 
@@ -350,12 +252,8 @@ def placeholder_set_us(select_scope):
               [Input('select-continent', 'value'),
                Input('select-figure', 'value')])
 def update_figure(selected_continent, selected_figure):
-    # TODO: THIS WILL NEED TO BE REWRITTEN
-    mainFig = {}
     if selected_continent == 'US' and selected_figure == 'graph1':
         return barchart_global()
-
-    # DEMO
     elif selected_figure == 'Global bar chart':
         return barchart_global()
     elif selected_figure == 'Local bar chart':
@@ -368,40 +266,6 @@ def update_figure(selected_continent, selected_figure):
         return multilinechart_global()
     elif selected_figure == 'Local multi line chart':
         return multilinechart_US()
-    elif selected_figure == 'Global bubble chart':
-        return bubblechart_global()
-    elif selected_figure == 'Local bubble chart':
-        return bubblechart_US()
-
-    # END OF DEMO
-    # if selected_figure == 'graph1':
-    #     mainFig['data'] = barchart(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases in {}'.format(selected_continent),
-    #                                   xaxis={'title': 'States'}, yaxis={'title': 'Number of confirmed cases'})
-    # elif selected_figure == 'graph2':
-    #     mainFig['data'] = stackbarchart(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country except China',
-    #                                   xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
-    #                                   barmode='stack')
-    # elif selected_figure == 'graph3':
-    #     mainFig['data'] = linechart(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Cases in the first 20 country expect China',
-    #                                   xaxis={'title': 'Country'}, yaxis={'title': 'Number of cases'},
-    #                                   barmode='stack')
-    # elif selected_figure == 'graph4':
-    #     mainFig['data'] = multilinechart(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases From 2020-01-22 to 2020-03-17',
-    #                                   xaxis={'title': 'Date'}, yaxis={'title': 'Number of cases'})
-    # elif selected_figure == 'graph5':
-    #     mainFig['data'] = bubblechart(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Confirmed Cases',
-    #                                   xaxis={'title': 'Recovered Cases'}, yaxis={'title': 'under Treatment Cases'},
-    #                                   hovermode='closest')
-    # elif selected_figure == 'graph6':
-    #     mainFig['data'] = heatmap(selected_continent)
-    #     mainFig['layout'] = go.Layout(title='Corona Virus Recovered Cases',
-    #                                   xaxis={'title': 'Day of Week'}, yaxis={'title': 'Week of Month'})
-    return mainFig
 
 
 if __name__ == '__main__':
