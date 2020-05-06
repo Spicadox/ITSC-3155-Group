@@ -10,11 +10,7 @@ globalCountries = pd.read_csv('../Datasets/countries-aggregated.csv')
 usConfirmed = pd.read_csv('../Datasets/us_confirmed.csv')
 usDeaths = pd.read_csv('../Datasets/us_deaths.csv')
 
-app = dash.Dash(__name__,
-                external_stylesheets=[
-                    'https://codepen.io/chriddyp/pen/bWLwgP.css'
-                ])
-
+app = dash.Dash()
 
 # GRAPH FUNCTIONS ED & SAM WORKSPACE -------------------------------------------------------------
 
@@ -33,6 +29,7 @@ def barchart_global():
     # Return the figure
     data_barchart_global = go.Figure(data=data_barchart, layout=layout)
     return data_barchart_global
+    # TODO: Add some sort of checkbox to select global data or just include it as default on the page
 
 
 def multibarchart_global():
@@ -75,6 +72,10 @@ def multilinechart_global():
     data_multilinechart_global.update_yaxes(title="Number of confirmed cases")
 
     return data_multilinechart_global
+
+
+def bubblechart_global():
+    pass
 
 
 def barchart_US():
@@ -137,98 +138,53 @@ def multilinechart_US():
                                   title='Corona Virus Confirmed Cases Over Time')
     data_multilinechart_US.update_xaxes(title="Date")
     data_multilinechart_US.update_yaxes(title="Number of confirmed cases")
+
     return data_multilinechart_US
 
 
 # WEBSITE LAYOUT JINQUAN WORKSPACE ---------------------------------------------------------------
-figures = {
-    'global_figures': ['Global bar chart', 'Global multi bar chart', 'Global multi line chart', 'Global bubble chart'],
-    'local_figures': ['Local bar chart', 'Local multi bar chart', 'Local multi line chart', 'Local bubble chart']
-    }
-all_figures = {'Global bar chart', 'Global multi bar chart', 'Global multi line chart', 'Global bubble chart',
-               'Local bar chart', 'Local multi bar chart', 'Local multi line chart', 'Local bubble chart'}
+figures = {'global_figures': ['Global bar chart', 'Global multi bar chart', 'Global multi line chart'],
+           'local_figures': ['Local bar chart', 'Local multi bar chart', 'Local multi line chart']
+}
+all_figures = {'Global bar chart', 'Global multi bar chart', 'Global multi line chart',
+               'Local bar chart', 'Local multi bar chart', 'Local multi line chart'}
 
-image = 'url(https://webgradients.com/public/webgradients_png/014%20Amy%20Crisp.png)'
 
-app.layout = html.Div(
-    className='row',
-    style={
-        'background-image': image,
-        # 'position': 'fixed',
-        'overflow - y': 'scroll',
-        # 'overflow - x': 'hidden',
-        'width': '100%',
-        'height': '100%',
-        'top': '0px',
-        'left': '0px',
-        'z-index': '1000'
-    },
-    children=[
-        html.H1(children='Global COVID-19 Dashboard',
-                style={
-                    'textAlign': 'left',
-                    'color': '#ef3e18',
+app.layout = html.Div(children=[
+    html.H1(children='TEAM J.E.T.S Draft',
+            style={
+                'textAlign': 'center',
+                'color': '#ef3e18'
+            }
+            ),
+    html.Div('Web dashboard for Data Visualization using Python', style={'textAlign': 'center'}),
+    html.Div('Coronavirus COVID-19 Global Cases -  1/22/2020 to 3/17/2020', style={'textAlign': 'center'}),
+    html.Br(),
+    html.Br(),
+    html.Hr(style={'color': '#7FDBFF'}),
+    html.H3('Interactive COVID-19 Chart', style={'color': '#df1e56'}),
+    dcc.Graph(id='graph1'),
+    html.Div('Would you like a global chart or US chart?', style={'color': '#ef3e18', 'margin':'10px'}),
+    dcc.Dropdown(
+        id='select-scope',
+        options=[
+            {'label': 'Global chart', 'value': 'global_chart'},
+            {'label': 'US chart', 'value': 'us_chart'}
+        ],
+        placeholder='Select a scope'
+    ),
 
-                },
-                className="ten columns"),
-        html.Img(
-            src="/assets/JETs2.png",
-            className="two columns",
-            height=75,
-        ),
-        html.Div('Web dashboard for Data Visualization using Python', style={'textAlign': 'center'}),
-        html.Div('Coronavirus COVID-19 Global Cases -  1/22/2020 to 3/17/2020', style={'textAlign': 'center'}),
-        html.Br(),
-        html.Hr(style={'color': '#7FDBFF'}),
-        html.H3('Interactive Bar chart', style={'color': '#df1e56'}),
-        html.Div('TODO: Put Information about Bar chart here'),
-        dcc.Graph(id='graph1',
-                  figure={
-                      'layout': go.Layout(
-                          paper_bgcolor='rgba(0,0,0,0)',
-                          plot_bgcolor='rgba(0,0,0,0)'
-                      )
-                  }
-                  ),
-        html.Div('Would you like a global chart or US chart?', style={'color': '#ef3e18', 'margin': '10px'}),
-        dcc.Dropdown(
-            id='select-scope',
-            options=[
-                {'label': 'Global chart', 'value': 'global_chart'},
-                {'label': 'A specific country chart', 'value': 'country_chart'},
-                {'label': 'US chart', 'value': 'us_chart'}
-            ],
-            placeholder='Select a scope',
-            className="six columns"
-        ),
 
-        html.Div('Please select a country', style={'color': '#ef3e18', 'margin': '10px'}, className="twelve columns"),
-        dcc.Dropdown(
-            id='select-continent',
-            options=[
-                {'label': 'US', 'value': 'US'},
-                {'label': 'China', 'value': 'China'},
-                {'label': 'Italy', 'value': 'Italy'},
-                {'label': 'Japan', 'value': 'Japan'},
-                {'label': 'Canada', 'value': 'Canada'},
-                {'label': 'South Korea', 'value': 'South Korea'}
-            ],
-            placeholder='Select a country',
-            disabled=True,
-            className="six columns"
-        ),
-        html.Div('Please select a figure', style={'color': '#ef3e18', 'margin': '10px'}, className="twelve columns"),
-        dcc.Dropdown(
-            id='select-figure',
-            options=[
-                {'label': k, 'value': k} for k in all_figures
-            ],
-            placeholder='Select a figure',
-            disabled=True,
-            className="six columns"
-        ),
-    ])
-
+    html.Div('Please select a figure', style={'color': '#ef3e18', 'margin':'10px'}),
+    dcc.Dropdown(
+        id='select-figure',
+        options=[
+            {'label': k, 'value': k} for k in all_figures
+        ],
+        placeholder='Select a figure',
+        disabled=True
+    ),
+])
 
 # UPDATE FIGURE FUNCTION ED & SAM WORKSPACE ---------------------------------------------------------
 
@@ -236,25 +192,24 @@ app.layout = html.Div(
 # Enable or disable dropdown boxes
 # Placeholder set to US if the scope is selected as us chart
 # Return a list of figure options based on scope
-@app.callback([Output('select-continent', 'placeholder'),
-               Output('select-figure', 'options'),
-               Output('select-continent', 'disabled'),
-               Output('select-figure', 'disabled')],
+@app.callback([Output('select-figure', 'options'),
+               Output('select-figure','disabled')],
               [Input('select-scope', 'value')])
 def placeholder_set_us(select_scope):
     if select_scope == 'us_chart':
-        return 'US', [{'label': i, 'value': i} for i in figures['local_figures']], True, False
+        return [{'label': i, 'value': i} for i in figures['local_figures']], False
     elif select_scope == 'global_chart':
-        return '', [{'label': i, 'value': i} for i in figures['global_figures']], True, False
+        return [{'label': i, 'value': i} for i in figures['global_figures']], False
 
 
 @app.callback(Output('graph1', 'figure'),
-              [Input('select-continent', 'value'),
-               Input('select-figure', 'value')])
-def update_figure(selected_continent, selected_figure):
-    if selected_continent == 'US' and selected_figure == 'graph1':
-        return barchart_global()
-    elif selected_figure == 'Global bar chart':
+              [Input('select-figure', 'value')])
+def update_figure(selected_figure):
+    # TODO: THIS WILL NEED TO BE REWRITTEN
+    mainFig = {}
+
+
+    if selected_figure == 'Global bar chart':
         return barchart_global()
     elif selected_figure == 'Local bar chart':
         return barchart_US()
@@ -266,7 +221,11 @@ def update_figure(selected_continent, selected_figure):
         return multilinechart_global()
     elif selected_figure == 'Local multi line chart':
         return multilinechart_US()
+    elif selected_figure == 'Global bubble chart':
+        return bubblechart_global()
+
+    return mainFig
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=3004)
+    app.run_server()
