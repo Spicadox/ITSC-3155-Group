@@ -10,7 +10,11 @@ globalCountries = pd.read_csv('../Datasets/countries-aggregated.csv')
 usConfirmed = pd.read_csv('../Datasets/us_confirmed.csv')
 usDeaths = pd.read_csv('../Datasets/us_deaths.csv')
 
-app = dash.Dash()
+app = dash.Dash(__name__,
+                external_stylesheets=[
+                    'https://codepen.io/chriddyp/pen/bWLwgP.css'
+                ])
+
 
 # GRAPH FUNCTIONS ED & SAM WORKSPACE -------------------------------------------------------------
 
@@ -49,7 +53,8 @@ def multibarchart_global():
     data_multibarchart = [trace1_multibarchart, trace2_multibarchart, trace3_multibarchart]
 
     # Preparing layout
-    layout = go.Layout(title='Total Corona Virus Confirmed Cases, Recovered, and Deaths in The World to Date', xaxis_title="Countries",
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases, Recovered, and Deaths in The World to Date',
+                       xaxis_title="Countries",
                        yaxis_title="Number of confirmed cases")
 
     # Return the figure
@@ -65,9 +70,9 @@ def multilinechart_global():
         {'Confirmed': 'sum'}).reset_index()
 
     data_multilinechart_global = px.line(multilinechart_df, x='Date', y='Confirmed', color='Country',
-                                     line_group="Country", hover_name="Country",
-                                     line_shape="spline", render_mode="svg",
-                                     title='Corona Virus Confirmed Cases Over Time')
+                                         line_group="Country", hover_name="Country",
+                                         line_shape="spline", render_mode="svg",
+                                         title='Corona Virus Confirmed Cases Over Time')
     data_multilinechart_global.update_xaxes(title="Date")
     data_multilinechart_global.update_yaxes(title="Number of confirmed cases")
 
@@ -113,7 +118,8 @@ def multibarchart_US():
     data_multibarchart = [trace1_multibarchart, trace2_multibarchart]
 
     # Preparing layout
-    layout = go.Layout(title='Total Corona Virus Confirmed Cases and Deaths in The United States to Date', xaxis_title="States",
+    layout = go.Layout(title='Total Corona Virus Confirmed Cases and Deaths in The United States to Date',
+                       xaxis_title="States",
                        yaxis_title="Number of confirmed cases")
 
     # Return the figure
@@ -129,9 +135,10 @@ def multilinechart_US():
     multilinechartconfirmed_df = multilinechartconfirmed_df.groupby(['Province/State', 'Date']).agg(
         {'Case': 'sum'}).reset_index()
 
-    data_multilinechart_US = px.line(multilinechartconfirmed_df, x='Date', y='Case', color='Province/State', line_group="Province/State",
-                                  hover_name="Province/State", line_shape="spline", render_mode="svg",
-                                  title='Corona Virus Confirmed Cases Over Time')
+    data_multilinechart_US = px.line(multilinechartconfirmed_df, x='Date', y='Case', color='Province/State',
+                                     line_group="Province/State",
+                                     hover_name="Province/State", line_shape="spline", render_mode="svg",
+                                     title='Corona Virus Confirmed Cases Over Time')
     data_multilinechart_US.update_xaxes(title="Date")
     data_multilinechart_US.update_yaxes(title="Number of confirmed cases")
 
@@ -141,46 +148,75 @@ def multilinechart_US():
 # WEBSITE LAYOUT JINQUAN WORKSPACE ---------------------------------------------------------------
 figures = {'global_figures': ['Global bar chart', 'Global multi bar chart', 'Global multi line chart'],
            'local_figures': ['Local bar chart', 'Local multi bar chart', 'Local multi line chart']
-}
+           }
 all_figures = {'Global bar chart', 'Global multi bar chart', 'Global multi line chart',
                'Local bar chart', 'Local multi bar chart', 'Local multi line chart'}
 
+image = 'url(https://webgradients.com/public/webgradients_png/014%20Amy%20Crisp.png)'
 
-app.layout = html.Div(children=[
-    html.H1(children='TEAM J.E.T.S Draft',
-            style={
-                'textAlign': 'center',
-                'color': '#ef3e18'
-            }
-            ),
-    html.Div('Web dashboard for Data Visualization using Python', style={'textAlign': 'center'}),
-    html.Div('Coronavirus COVID-19 Global Cases -  1/22/2020 to 3/17/2020', style={'textAlign': 'center'}),
-    html.Br(),
-    html.Br(),
-    html.Hr(style={'color': '#7FDBFF'}),
-    html.H3('Interactive COVID-19 Chart', style={'color': '#df1e56'}),
-    dcc.Graph(id='graph1'),
-    html.Div('Would you like a global chart or US chart?', style={'color': '#ef3e18', 'margin':'10px'}),
-    dcc.Dropdown(
-        id='select-scope',
-        options=[
-            {'label': 'Global chart', 'value': 'global_chart'},
-            {'label': 'US chart', 'value': 'us_chart'}
-        ],
-        placeholder='Select a scope'
-    ),
+app.layout = html.Div(
+    className='row',
+    style={
+        'background-image': image,
+        # 'position': 'fixed',
+        'overflow - y': 'scroll',
+        # 'overflow - x': 'hidden',
+        'width': '100%',
+        'height': '100%',
+        'top': '0px',
+        'left': '0px',
+        'z-index': '1000'
+    },
+    children=[
+        html.H1(children='Global COVID-19 Dashboard',
+                style={
+                    'textAlign': 'left',
+                    'color': '#ef3e18',
 
+                },
+                className="ten columns"),
+        html.Img(
+            src="/assets/JETs2.png",
+            className="two columns",
+            height=75,
+        ),
+        html.Div('Web dashboard for Data Visualization using Python', style={'textAlign': 'center'}),
+        html.Div('Coronavirus COVID-19 Global Cases -  1/22/2020 to 3/17/2020', style={'textAlign': 'center'}),
+        html.Br(),
+        html.Hr(style={'color': '#7FDBFF'}),
+        html.H3('Interactive COVID-19 Chart', style={'color': '#df1e56'}),
+        dcc.Graph(id='graph1',
+                  figure={
+                      'layout': go.Layout(
+                          paper_bgcolor='rgba(0,0,0,0)',
+                          plot_bgcolor='rgba(0,0,0,0)'
+                      )
+                  }
+                  ),
+        html.Div('Would you like a global chart or US chart?', style={'color': '#ef3e18', 'margin': '10px'},
+                 className="twelve columns"),
+        dcc.Dropdown(
+            id='select-scope',
+            options=[
+                {'label': 'Global chart', 'value': 'global_chart'},
+                {'label': 'US chart', 'value': 'us_chart'}
+            ],
+            placeholder='Select a scope',
+            className="six columns"
+        ),
 
-    html.Div('Please select a figure', style={'color': '#ef3e18', 'margin':'10px'}),
-    dcc.Dropdown(
-        id='select-figure',
-        options=[
-            {'label': k, 'value': k} for k in all_figures
-        ],
-        placeholder='Select a figure',
-        disabled=True
-    ),
-])
+        html.Div('Please select a figure', style={'color': '#ef3e18', 'margin': '10px'}, className="twelve columns"),
+        dcc.Dropdown(
+            id='select-figure',
+            options=[
+                {'label': k, 'value': k} for k in all_figures
+            ],
+            placeholder='Select a figure',
+            disabled=True,
+            className="six columns"
+        ),
+    ])
+
 
 # UPDATE FIGURE FUNCTION ED & SAM WORKSPACE ---------------------------------------------------------
 
@@ -189,7 +225,7 @@ app.layout = html.Div(children=[
 # Placeholder set to US if the scope is selected as us chart
 # Return a list of figure options based on scope
 @app.callback([Output('select-figure', 'options'),
-               Output('select-figure','disabled')],
+               Output('select-figure', 'disabled')],
               [Input('select-scope', 'value')])
 def placeholder_set_us(select_scope):
     if select_scope == 'us_chart':
@@ -202,7 +238,6 @@ def placeholder_set_us(select_scope):
               [Input('select-figure', 'value')])
 def update_figure(selected_figure):
     mainFig = {}
-
 
     if selected_figure == 'Global bar chart':
         return barchart_global()
