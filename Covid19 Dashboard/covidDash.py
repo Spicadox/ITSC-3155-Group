@@ -74,10 +74,6 @@ def multilinechart_global():
     return data_multilinechart_global
 
 
-def bubblechart_global():
-    pass
-
-
 def barchart_US():
     recentdate = pd.to_datetime(usConfirmed['Date'], format='%Y-%m-%d').max()
     recentdate = str(recentdate).rstrip(' 00:00:00')
@@ -205,7 +201,6 @@ def placeholder_set_us(select_scope):
 @app.callback(Output('graph1', 'figure'),
               [Input('select-figure', 'value')])
 def update_figure(selected_figure):
-    # TODO: THIS WILL NEED TO BE REWRITTEN
     mainFig = {}
 
 
@@ -221,8 +216,6 @@ def update_figure(selected_figure):
         return multilinechart_global()
     elif selected_figure == 'Local multi line chart':
         return multilinechart_US()
-    elif selected_figure == 'Global bubble chart':
-        return bubblechart_global()
 
     return mainFig
 
