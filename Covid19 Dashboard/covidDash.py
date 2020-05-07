@@ -33,7 +33,6 @@ def barchart_global():
     # Return the figure
     data_barchart_global = go.Figure(data=data_barchart, layout=layout)
     return data_barchart_global
-    # TODO: Add some sort of checkbox to select global data or just include it as default on the page
 
 
 def multibarchart_global():
@@ -152,6 +151,9 @@ figures = {'global_figures': ['Global bar chart', 'Global multi bar chart', 'Glo
 all_figures = {'Global bar chart', 'Global multi bar chart', 'Global multi line chart',
                'Local bar chart', 'Local multi bar chart', 'Local multi line chart'}
 
+recentdate = pd.to_datetime(globalCountries['Date'], format='%Y-%m-%d').max()
+recentdate = str(recentdate).rstrip(' 00:00:00')
+
 image = 'url(https://webgradients.com/public/webgradients_png/014%20Amy%20Crisp.png)'
 
 app.layout = html.Div(
@@ -181,7 +183,7 @@ app.layout = html.Div(
             height=75,
         ),
         html.Div('Web dashboard for Data Visualization using Python', style={'textAlign': 'center'}),
-        html.Div('Coronavirus COVID-19 Global Cases -  1/22/2020 to 3/17/2020', style={'textAlign': 'center'}),
+        html.Div('Coronavirus COVID-19 Global Cases -  2020/1/22 to ' + recentdate, style={'textAlign': 'center'}),
         html.Br(),
         html.Hr(style={'color': '#7FDBFF'}),
         html.H3('Interactive COVID-19 Chart', style={'color': '#df1e56'}),
